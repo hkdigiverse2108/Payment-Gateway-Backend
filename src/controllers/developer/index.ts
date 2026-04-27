@@ -1,8 +1,8 @@
-import { userModel } from '../../database';
 import { apiResponse, HTTP_STATUS, createUserService } from '../../common';
+import { userModel } from '../../database';
 import { reqInfo, responseMessage, getFirstMatch, updateData } from '../../helper';
-import crypto from 'crypto';
 import { updateMerchantConfigSchema, testWebhookSchema } from '../../validation';
+import crypto from 'crypto';
 
 export const getMerchantConfig = async (req, res) => {
     reqInfo(req);
@@ -33,7 +33,7 @@ export const updateMerchantConfig = async (req, res) => {
             websiteName,
             websiteUrl,
             payinCallbackUrl,
-            payoutCallbackUrl
+            payoutCallbackUrl 
         });
 
         return res.status(HTTP_STATUS.OK).json(new apiResponse(HTTP_STATUS.OK, "Config updated successfully", user, {}));
