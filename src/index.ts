@@ -32,6 +32,7 @@ app.get('/isServerUp', (req, res) => {
     res.send('Server is running ');
 });
 
+
 app.use(router);
 
 app.all(/.*/, bad_gateway);
