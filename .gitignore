@@ -1,0 +1,11 @@
+node_modules
+build
+package-lock.json
+*.zip
+test.js
+test.html
+*.bat
+.env
+images
+pdf
+debug_output.txt
