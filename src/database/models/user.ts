@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 import { USER_ROLE } from '../../common';
 
 export interface IUser {
-    username: string;
+    userName: string;
     name?: string;
     email?: string;
     mobileNumber?: number;
@@ -22,7 +22,7 @@ export interface IUser {
 export interface IUserDocument extends IUser, Document { }
 
 const userSchema = new Schema<IUserDocument>({
-    username: { type: String },
+    userName: { type: String },
     name: { type: String },
     email: { type: String },
     mobileNumber: { type: Number },
