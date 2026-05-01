@@ -93,7 +93,7 @@ export const getUsers = async (req, res) => {
             criteria.role = { $ne: USER_ROLE.ADMIN }
         }
 
-        const response = await getDataWithSorting(userModel, criteria, { _id: 1, userName: 1, email: 1, mobileNumber: 1, isActive: 1, createdAt: 1, updatedAt: 1 }, options);
+        const response = await getDataWithSorting(userModel, criteria, {}, options);
         const totalCount = await countData(userModel, criteria);
         const stateObj = await resolvePagination(page, limit);
 
