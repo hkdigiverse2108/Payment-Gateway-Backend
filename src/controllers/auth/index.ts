@@ -11,7 +11,7 @@ export const login = async (req, res) => {
 
         const user = await getFirstMatch(userModel, {
             $or: [
-                { username: value.userName },
+                { userName: value.userName },
                 { email: value.userName?.toLowerCase() }
             ],
             isDeleted: false
@@ -28,7 +28,7 @@ export const login = async (req, res) => {
         return res.status(HTTP_STATUS.OK).json(new apiResponse(HTTP_STATUS.OK, responseMessage.loginSuccess, {
             _id: user._id,
             name: user.name,
-            username: user.username,
+            userName: user.userName,
             mobileNumber: user.mobileNumber,
             role: user.role,
             token
