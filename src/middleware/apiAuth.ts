@@ -30,8 +30,14 @@ export const apiAuthMiddleware = async (req: Request, res: Response, next: NextF
             .update(payload)
             .digest('hex');
 
+        console.log('Received Signature:', signature);
+        console.log('Expected Signature:', expectedSignature);
+
         if (signature !== expectedSignature) {
-            return res.status(HTTP_STATUS.UNAUTHORIZED).json(new apiResponse(HTTP_STATUS.UNAUTHORIZED, "Invalid Signature", {}, {}));
+            return res.status(HTTP_STATUS.UNAUTHORIZED).json(new apiResponse(HTTP_STATUS.UNAUTHORIZED, "Invalid Signature", {
+                received: signature,
+                expected: expectedSignature
+            }, {}));
         }
 
         (req as any).user = user;

@@ -6,6 +6,8 @@ export interface ITransaction {
     orderId: string;
     traId: string;
     type: string; // deposit, withdraw
+    gateway?: string;
+    paymentMethod?: string;
     amount: number;
     status: string; // pending, success, failed, etc.
     paymentStatus: string; // approved, processing, etc.
@@ -33,6 +35,8 @@ const transactionSchema = new Schema<ITransactionDocument>({
     orderId: { type: String, required: true, unique: true },
     traId: { type: String, required: true, unique: true },
     type: { type: String, enum: Object.values(TRANSACTION_TYPE), required: true },
+    gateway: { type: String, default: 'cashfree' },
+    paymentMethod: { type: String, enum: Object.values(PAYMENT_METHOD) },
     amount: { type: Number, required: true },
     status: { type: String, enum: Object.values(ORDER_STATUS), default: ORDER_STATUS.PENDING },
     paymentStatus: { type: String, enum: Object.values(PAYMENT_STATUS), default: PAYMENT_STATUS.PENDING },

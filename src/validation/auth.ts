@@ -2,7 +2,7 @@ import Joi from 'joi';
 import { isValidObjectId } from '../common';
 
 export const loginSchema = Joi.object({
-    userName: Joi.string().required(),
+    username: Joi.string().required(),
     password: Joi.string().required()
 });
 

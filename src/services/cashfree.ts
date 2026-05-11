@@ -9,7 +9,7 @@ const cashfree = new Cashfree(
     process.env.CASHFREE_SECRET_KEY || ''
 );
 
-export const createOrder = async (orderData: {
+export const createCashfreeOrder = async (orderData: {
     order_id: string;
     order_amount: number;
     order_currency: string;
@@ -44,7 +44,7 @@ export const getOrder = async (orderId: string) => {
     }
 };
 
-export const verifyWebhookSignature = (signature: string, rawBody: string, timestamp: string) => {
+export const verifyCashfreeWebhookSignature = (signature: string, rawBody: string, timestamp: string) => {
     try {
         cashfree.PGVerifyWebhookSignature(signature, rawBody, timestamp);
         return true;

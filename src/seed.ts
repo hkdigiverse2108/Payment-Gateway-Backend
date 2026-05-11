@@ -16,11 +16,11 @@ const seed = async () => {
 
         // 1. Create Admin User
         const adminUsername = 'pramitmangukiya';
-        const existingAdmin = await userModel.findOne({ userName: adminUsername });
+        const existingAdmin = await userModel.findOne({ username: adminUsername });
         const password = await generateHash('Admin@123');
         if (!existingAdmin) {
             await userModel.create({
-                userName: adminUsername,
+                username: adminUsername,
                 email: 'pramitmangukiya602@gmail.com',
                 password: password, // Manually hashed
                 role: 'admin',

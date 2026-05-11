@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Razorpay Test</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <h2>Razorpay Payment Test</h2>
+    <input type="text" id="razorpay_key" placeholder="Enter Razorpay Key ID" style="width: 300px;"><br><br>
+    <input type="text" id="order_id" placeholder="Enter Order ID from Postman" style="width: 300px;"><br><br>
+    <button id="pay-button">Pay with Razorpay</button>
+
+    <script>
+        document.getElementById('pay-button').onclick = function(e) {
+            const keyId = document.getElementById('razorpay_key').value;
+            const orderId = document.getElementById('order_id').value;
+
+            if (!keyId || !orderId) {
+                alert("Please enter both Key ID and Order ID");
+                return;
+            }
+
+            var options = {
+                "key": keyId, 
+                "currency": "INR",
+                "name": "Test Company",
+                "description": "Test Transaction",
+                "order_id": orderId,
+                "handler": function (response){
+                    // Frontend Verification Call
+                    fetch('http://localhost:5000/transaction/verify/razorpay', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_signature: response.razorpay_signature
+                        }),
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data.status === 200) {
+                            alert("Payment Verified & Database Updated! ID: " + response.razorpay_payment_id);
+                        } else {
+                            alert("Verification Failed: " + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert("Error verifying payment");
+                    });
+                },
+                "prefill": {
+                    "name": "Ishika",
+                    "email": "test@example.com",
+                    "contact": "8980650518"
+                },
+                "theme": {
+                    "color": "#3399cc"
+                }
+            };
+            var rzp1 = new Razorpay(options);
+            rzp1.on('payment.failed', function (response){
+                alert("Payment Failed: " + response.error.description);
+                console.error(response.error);
+            });
+            rzp1.open();
+            e.preventDefault();
+        }
+    </script>
+</body>
+</html>

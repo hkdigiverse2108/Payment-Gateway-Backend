@@ -11,13 +11,15 @@ export const login = async (req, res) => {
 
         const user = await getFirstMatch(userModel, {
             $or: [
-                { userName: value.userName },
-                { email: value.userName?.toLowerCase() }
+                { username: value.username },
+                { email: value.username?.toLowerCase() }
             ],
             isDeleted: false
         }, {}, {})
 
-        if (!user) return res.status(HTTP_STATUS.UNAUTHORIZED).json(new apiResponse(HTTP_STATUS.UNAUTHORIZED, responseMessage.invalidCredentials(value.userName), {}, {}));
+        console.log("user", user);
+
+        if (!user) return res.status(HTTP_STATUS.UNAUTHORIZED).json(new apiResponse(HTTP_STATUS.UNAUTHORIZED, responseMessage.invalidCredentials(value.username), {}, {}));
 
         const isMatch = await compareHash(value.password, user.password);
         if (!isMatch) return res.status(HTTP_STATUS.UNAUTHORIZED).json(new apiResponse(HTTP_STATUS.UNAUTHORIZED, responseMessage.invalidUserPassword, {}, {}));
@@ -28,7 +30,7 @@ export const login = async (req, res) => {
         return res.status(HTTP_STATUS.OK).json(new apiResponse(HTTP_STATUS.OK, responseMessage.loginSuccess, {
             _id: user._id,
             name: user.name,
-            userName: user.userName,
+            username: user.username,
             mobileNumber: user.mobileNumber,
             role: user.role,
             token

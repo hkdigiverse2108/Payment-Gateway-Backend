@@ -12,10 +12,10 @@ import { userJWT } from '../helper'
 const router = Router()
 
 router.use('/auth', authRouter)
+router.use('/transaction', transactionRouter)
 
 router.use(userJWT)
 router.use('/user', userRouter)
-router.use('/transaction', transactionRouter)
 router.use('/wallet', walletRouter)
 router.use('/withdraw', withdrawRouter)
 router.use('/analytics', analyticsRouter)

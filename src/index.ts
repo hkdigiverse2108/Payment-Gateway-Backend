@@ -10,8 +10,19 @@ const app = express();
 
 app.use(cors())
 app.use(mongooseConnection)
-app.use(bodyParser.json({ limit: '200mb' }))
-app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }))
+app.use(bodyParser.json({
+    limit: '200mb',
+    verify: (req: any, res, buf) => {
+        req.rawBody = buf.toString();
+    }
+}))
+app.use(bodyParser.urlencoded({
+    limit: '200mb',
+    extended: true,
+    verify: (req: any, res, buf) => {
+        req.rawBody = buf.toString();
+    }
+}))
 
 const health = (req, res) => {
     return res.status(200).json({
@@ -32,6 +43,10 @@ app.get('/isServerUp', (req, res) => {
     res.send('Server is running ');
 });
 
+import path from 'path';
+app.get('/test-rzp', (req, res) => {
+    res.sendFile(path.join(process.cwd(), 'test_razorpay.html'));
+});
 
 app.use(router);
 

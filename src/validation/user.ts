@@ -2,7 +2,7 @@ import Joi from 'joi';
 import { isValidObjectId } from '../common';
 
 export const addUserSchema = Joi.object({
-    userName: Joi.string().required(),
+    username: Joi.string().required(),
     name: Joi.string().required(),
     email: Joi.string().required(),
     mobileNumber: Joi.number().required(),
@@ -16,7 +16,7 @@ export const addUserSchema = Joi.object({
 
 export const editUserSchema = Joi.object({
     userId: Joi.string().custom(isValidObjectId).required(),
-    userName: Joi.string().required(),
+    username: Joi.string().required(),
     name: Joi.string().required(),
     email: Joi.string().required(),
     mobileNumber: Joi.number().required(),
