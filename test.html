@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+</head>
+<body>
+
+<button onclick="pay()">Pay Now</button>
+
+<script>
+  const cashfree = Cashfree({
+    mode: "sandbox"
+  });
+
+  async function pay() {
+
+    const sessionId = "session_MpB4kCV_VVktSKiRX-CZgowa7gZIjnL6dpXW8yAK1biyQjX8awjWAz-gOctJmQ6cGZ3uoVcUlURYcXr6gUjTBTMALaFG_NpUArMJQWgBQk_YF_Hn0SsiLvw3IZ3BHwpaymentpayment";
+
+    await cashfree.checkout({
+      paymentSessionId: sessionId,
+      redirectTarget: "_self"
+    });
+  }
+</script>
+
+</body>
+</html>
