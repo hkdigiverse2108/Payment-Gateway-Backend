@@ -8,7 +8,7 @@ export const createDepositSchema = Joi.object({
     customerEmail: Joi.string().optional().email().allow(''),
     returnUrl: Joi.string().optional().allow('').uri(),
     notifyUrl: Joi.string().optional().allow('').uri(),
-    gateway: Joi.string().optional().valid('cashfree', 'paytm', 'razorpay').default('cashfree'),
+    gateway: Joi.string().optional().valid('cashfree', 'paytm', 'razorpay', 'payu', 'phonepe','stripe').default('cashfree'),
     metadata: Joi.object().optional()
 });
 

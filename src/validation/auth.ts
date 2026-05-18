@@ -4,7 +4,7 @@ import { isValidObjectId } from '../common';
 export const loginSchema = Joi.object({
     username: Joi.string().required(),
     password: Joi.string().required()
-});
+})
 
 export const changePasswordSchema = Joi.object({
     userId: Joi.string().custom(isValidObjectId).required(),

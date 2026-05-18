@@ -1,7 +1,7 @@
 {
   "item": [
     {
-      "id": "bc5e5203-4cf9-4fa9-953a-543ae0829090",
+      "id": "55d9ccc1-4cab-4e1b-ad35-11955a18d90b",
       "name": "AUTH",
       "description": {
         "content": "Routes for auth",
@@ -9,11 +9,11 @@
       },
       "item": [
         {
-          "id": "2262ac4f-9542-409a-9705-d51fd0d04553",
+          "id": "ca2c1182-5e3d-435d-af99-3c7145244546",
           "name": "Login",
           "request": {
             "description": {
-              "content": "Controller: login\nSchema: loginSchema\n\n### Validation Rules\n| Field | Type | Requirement |\n|---|---|---|\n| userName | string | Required |\n| password | string | Required |\n",
+              "content": "Controller: login\nSchema: loginSchema\n\n### Validation Rules\n| Field | Type | Requirement |\n|---|---|---|\n| username | string | Required |\n| password | string | Required |\n",
               "type": "text/markdown"
             },
             "url": {
@@ -36,14 +36,14 @@
             "method": "POST",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"userName\": \"sample_userName\",\n  \"password\": \"Password123!\"\n}"
+              "raw": "{\n  \"username\": \"sample_username\",\n  \"password\": \"Admin@123\",\n  \"userName\": \"pramitmangukiya602@gmail.com\"\n}"
             }
           },
           "response": [],
           "event": []
         },
         {
-          "id": "356f77fb-22c5-4934-bfad-2bfdccff513a",
+          "id": "265ff86f-a86d-453f-bd1f-a63cd638a470",
           "name": "Change Password",
           "request": {
             "description": {
@@ -80,7 +80,424 @@
       "event": []
     },
     {
-      "id": "8c3c9cf8-c60c-4dea-9531-841fec6f445a",
+      "id": "d421de0a-f963-4e30-95c6-b6d2ca6b587a",
+      "name": "TRANSACTION",
+      "description": {
+        "content": "Routes for transaction",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "af991519-82f7-439b-8efd-cfc9825bdcba",
+          "name": "Get Transactions",
+          "request": {
+            "description": {
+              "content": "Controller: getTransactions\nSchema: getTransactionsSchema\n\n### Validation Rules\n| Field | Type | Requirement |\n|---|---|---|\n| page | number | Optional |\n| limit | number | Optional |\n| search | string | Optional |\n| type | string | Optional |\n| status | string | Optional |\n| paymentStatus | string | Optional |\n| startDateFilter | string | Optional |\n| endDateFilter | string | Optional |\n| sortFilter | string | Optional |\n",
+              "type": "text/markdown"
+            },
+            "url": {
+              "path": [
+                "transaction",
+                "all"
+              ],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": "sample_search"
+                },
+                {
+                  "key": "type",
+                  "value": "sample_type"
+                },
+                {
+                  "key": "status",
+                  "value": "sample_status"
+                },
+                {
+                  "key": "paymentStatus",
+                  "value": "sample_paymentStatus"
+                },
+                {
+                  "key": "startDateFilter",
+                  "value": "sample_startDateFilter"
+                },
+                {
+                  "key": "endDateFilter",
+                  "value": "sample_endDateFilter"
+                },
+                {
+                  "key": "sortFilter",
+                  "value": "sample_sortFilter"
+                }
+              ],
+              "variable": []
+            },
+            "method": "GET",
+            "body": {}
+          },
+          "response": [],
+          "event": []
+        },
+        {
+          "id": "c9e778bc-863f-4e86-a05d-7510cf4ff0d9",
+          "name": "Get Transactions",
+          "request": {
+            "description": {
+              "content": "Controller: exportTransactions\nSchema: getTransactionsSchema\n\n### Validation Rules\n| Field | Type | Requirement |\n|---|---|---|\n| page | number | Optional |\n| limit | number | Optional |\n| search | string | Optional |\n| type | string | Optional |\n| status | string | Optional |\n| paymentStatus | string | Optional |\n| startDateFilter | string | Optional |\n| endDateFilter | string | Optional |\n| sortFilter | string | Optional |\n",
+              "type": "text/markdown"
+            },
+            "url": {
+              "path": [
+                "transaction",
+                "export"
+              ],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": "sample_search"
+                },
+                {
+                  "key": "type",
+                  "value": "sample_type"
+                },
+                {
+                  "key": "status",
+                  "value": "sample_status"
+                },
+                {
+                  "key": "paymentStatus",
+                  "value": "sample_paymentStatus"
+                },
+                {
+                  "key": "startDateFilter",
+                  "value": "sample_startDateFilter"
+                },
+                {
+                  "key": "endDateFilter",
+                  "value": "sample_endDateFilter"
+                },
+                {
+                  "key": "sortFilter",
+                  "value": "sample_sortFilter"
+                }
+              ],
+              "variable": []
+            },
+            "method": "GET",
+            "body": {}
+          },
+          "response": [],
+          "event": []
+        },
+        {
+          "id": "ae96491c-06ac-4267-a8c7-21a1254f6757",
+          "name": "Create Cashfree",
+          "request": {
+            "description": {
+              "content": "Controller: cashfreeWebhook",
+              "type": "text/markdown"
+            },
+            "url": {
+              "path": [
+                "transaction",
+                "webhook",
+                "cashfree"
+              ],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "POST",
+            "body": {}
+          },
+          "response": [],
+          "event": []
+        },
+        {
+          "id": "039700b2-9774-4ece-8352-2446ffd0f16f",
+          "name": "Create Razorpay",
+          "request": {
+            "description": {
+              "content": "Controller: razorpayWebhook",
+              "type": "text/markdown"
+            },
+            "url": {
+              "path": [
+                "transaction",
+                "webhook",
+                "razorpay"
+              ],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "POST",
+            "body": {}
+          },
+          "response": [],
+          "event": []
+        },
+        {
+          "id": "a6fb06f8-cc59-4510-a6a3-0f8b36f64260",
+          "name": "Create Razorpay",
+          "request": {
+            "description": {
+              "content": "Controller: verifyRazorpayPayment",
+              "type": "text/markdown"
+            },
+            "url": {
+              "path": [
+                "transaction",
+                "verify",
+                "razorpay"
+              ],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "POST",
+            "body": {}
+          },
+          "response": [],
+          "event": []
+        },
+        {
+          "id": "518a676e-041f-46bc-a81e-f9a169020a70",
+          "name": "Create Payu",
+          "request": {
+            "description": {
+              "content": "Controller: payuWebhook",
+              "type": "text/markdown"
+            },
+            "url": {
+              "path": [
+                "transaction",
+                "webhook",
+                "payu"
+              ],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "POST",
+            "body": {}
+          },
+          "response": [],
+          "event": []
+        },
+        {
+          "id": "689bdab6-a848-4f33-916c-8c5dc004a7d3",
+          "name": "Create Phonepe",
+          "request": {
+            "description": {
+              "content": "Controller: phonePeWebhook",
+              "type": "text/markdown"
+            },
+            "url": {
+              "path": [
+                "transaction",
+                "webhook",
+                "phonepe"
+              ],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "POST",
+            "body": {}
+          },
+          "response": [],
+          "event": []
+        },
+        {
+          "id": "7baa37f0-319c-42bf-9404-e6abd2301dc0",
+          "name": "Create Phonepe",
+          "request": {
+            "description": {
+              "content": "Controller: verifyPhonePePayment",
+              "type": "text/markdown"
+            },
+            "url": {
+              "path": [
+                "transaction",
+                "verify",
+                "phonepe"
+              ],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "POST",
+            "body": {}
+          },
+          "response": [],
+          "event": []
+        },
+        {
+          "id": "240893b9-ff6c-4935-bec3-50125f963869",
+          "name": "Create Paytm",
+          "request": {
+            "description": {
+              "content": "Controller: paytmWebhook",
+              "type": "text/markdown"
+            },
+            "url": {
+              "path": [
+                "transaction",
+                "webhook",
+                "paytm"
+              ],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "POST",
+            "body": {}
+          },
+          "response": [],
+          "event": []
+        },
+        {
+          "id": "5c6462e0-4606-4b58-ba9b-2bbd86f014a9",
+          "name": "Create Paytm",
+          "request": {
+            "description": {
+              "content": "Controller: verifyPaytmPayment",
+              "type": "text/markdown"
+            },
+            "url": {
+              "path": [
+                "transaction",
+                "verify",
+                "paytm"
+              ],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "POST",
+            "body": {}
+          },
+          "response": [],
+          "event": []
+        },
+        {
+          "id": "e46c9952-046d-4c80-b68b-dcdef0d62d68",
+          "name": "Create Deposit",
+          "request": {
+            "description": {
+              "content": "Controller: createDeposit\nSchema: createDepositSchema\n\n### Validation Rules\n| Field | Type | Requirement |\n|---|---|---|\n| amount | number | Required |\n| orderId | string | Required |\n| customerPhone | string | Required |\n| customerName | string | Optional |\n| customerEmail | string | Optional |\n| returnUrl | string | Optional |\n| notifyUrl | string | Optional |\n| gateway | string | Optional |\n| metadata | object | Optional |\n",
+              "type": "text/markdown"
+            },
+            "url": {
+              "path": [
+                "transaction",
+                "payin"
+              ],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 123,\n  \"orderId\": \"TRA67468765845815451re515546445\",\n  \"customerPhone\": \"9725097885\",\n  \"customerName\": \"test\",\n  \"customerEmail\": \"test@gmail.com\",\n  \"returnUrl\": \"https://youtube.com\",\n  \"notifyUrl\": \"https://youtube.com\",\n  \"gateway\": \"sample_gateway\",\n  \"metadata\": {}\n}"
+            }
+          },
+          "response": [],
+          "event": []
+        },
+        {
+          "id": "fc7e0fb2-d1bd-4a8a-a74d-4c502f91267d",
+          "name": "Get Transaction Status",
+          "request": {
+            "description": {
+              "content": "Controller: getTransactionStatus\nSchema: getTransactionStatusSchema\n\n### Validation Rules\n| Field | Type | Requirement |\n|---|---|---|\n| orderId | string | Required |\n",
+              "type": "text/markdown"
+            },
+            "url": {
+              "path": [
+                "transaction",
+                "status"
+              ],
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "query": [
+                {
+                  "key": "orderId",
+                  "value": "sample_orderId"
+                }
+              ],
+              "variable": []
+            },
+            "method": "GET",
+            "body": {}
+          },
+          "response": [],
+          "event": []
+        }
+      ],
+      "event": [],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "TOKEN",
+            "value": "{{TOKEN}}",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "id": "68b7073d-b479-4405-ab25-5b67f22fc2d9",
       "name": "USER",
       "description": {
         "content": "Routes for user",
@@ -88,11 +505,11 @@
       },
       "item": [
         {
-          "id": "a36a550a-9877-496c-a5a6-745d763d45e1",
+          "id": "cdbcd4bb-70ea-4a1b-a547-e1c634c6e1f8",
           "name": "Add User",
           "request": {
             "description": {
-              "content": "Controller: createUser\nSchema: addUserSchema\n\n### Validation Rules\n| Field | Type | Requirement |\n|---|---|---|\n| userName | string | Required |\n| name | string | Required |\n| email | string | Required |\n| mobileNumber | number | Required |\n| password | string | Required |\n| websiteName | string | Required |\n| websiteUrl | string | Required |\n| payinCallbackUrl | string | Required |\n| payoutCallbackUrl | string | Required |\n| isActive | boolean | Optional |\n",
+              "content": "Controller: createUser\nSchema: addUserSchema\n\n### Validation Rules\n| Field | Type | Requirement |\n|---|---|---|\n| username | string | Required |\n| name | string | Required |\n| email | string | Required |\n| mobileNumber | number | Required |\n| password | string | Required |\n| websiteName | string | Required |\n| websiteUrl | string | Required |\n| payinCallbackUrl | string | Required |\n| payoutCallbackUrl | string | Required |\n| isActive | boolean | Optional |\n",
               "type": "text/markdown"
             },
             "url": {
@@ -115,18 +532,18 @@
             "method": "POST",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"userName\": \"pramitmangukiya2410\",\n  \"name\": \"pramit mangukiya\",\n  \"email\": \"pramitmangukiya25@gmail.com \",\n  \"mobileNumber\": 1245789630,\n  \"password\": \"Admin@123\",\n  \"websiteName\": \"uatb2c\",\n  \"websiteUrl\": \"https://youtube.com\",\n  \"payinCallbackUrl\": \"sample_payinCallbackUrl\",\n  \"payoutCallbackUrl\": \"sample_payoutCallbackUrl\",\n  \"isActive\": true\n}"
+              "raw": "{\n  \"username\": \"sample_username\",\n  \"name\": \"pramit mangukiya\",\n  \"email\": \"pramitmangukiya25@gmail.com \",\n  \"mobileNumber\": 1245789630,\n  \"password\": \"Admin@123\",\n  \"websiteName\": \"uatb2c\",\n  \"websiteUrl\": \"https://youtube.com\",\n  \"payinCallbackUrl\": \"sample_payinCallbackUrl\",\n  \"payoutCallbackUrl\": \"sample_payoutCallbackUrl\",\n  \"isActive\": true,\n  \"userName\": \"pramitmangukiya2410\"\n}"
             }
           },
           "response": [],
           "event": []
         },
         {
-          "id": "6fc067ec-8d8a-4de1-ac7d-d5e2a328cbc0",
+          "id": "d398c12f-493e-41fd-afe3-4801df54431a",
           "name": "Edit User",
           "request": {
             "description": {
-              "content": "Controller: updateUser\nSchema: editUserSchema\n\n### Validation Rules\n| Field | Type | Requirement |\n|---|---|---|\n| userId | string | Required |\n| userName | string | Required |\n| name | string | Required |\n| email | string | Required |\n| mobileNumber | number | Required |\n| password | string | Required |\n| websiteName | string | Required |\n| websiteUrl | string | Required |\n| payinCallbackUrl | string | Required |\n| payoutCallbackUrl | string | Required |\n| isActive | boolean | Optional |\n",
+              "content": "Controller: updateUser\nSchema: editUserSchema\n\n### Validation Rules\n| Field | Type | Requirement |\n|---|---|---|\n| userId | string | Required |\n| username | string | Required |\n| name | string | Required |\n| email | string | Required |\n| mobileNumber | number | Required |\n| password | string | Required |\n| websiteName | string | Required |\n| websiteUrl | string | Required |\n| payinCallbackUrl | string | Required |\n| payoutCallbackUrl | string | Required |\n| isActive | boolean | Optional |\n",
               "type": "text/markdown"
             },
             "url": {
@@ -194,14 +611,14 @@
             "method": "PUT",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"userId\": \"sample_userId\",\n  \"userName\": \"sample_userName\",\n  \"name\": \"sample_name\",\n  \"email\": \"test@example.com\",\n  \"mobileNumber\": 123,\n  \"password\": \"Password123!\",\n  \"websiteName\": \"sample_websiteName\",\n  \"websiteUrl\": \"sample_websiteUrl\",\n  \"payinCallbackUrl\": \"sample_payinCallbackUrl\",\n  \"payoutCallbackUrl\": \"sample_payoutCallbackUrl\",\n  \"isActive\": true\n}"
+              "raw": "{\n  \"userId\": \"sample_userId\",\n  \"username\": \"sample_username\",\n  \"name\": \"sample_name\",\n  \"email\": \"test@example.com\",\n  \"mobileNumber\": 123,\n  \"password\": \"Password123!\",\n  \"websiteName\": \"sample_websiteName\",\n  \"websiteUrl\": \"sample_websiteUrl\",\n  \"payinCallbackUrl\": \"sample_payinCallbackUrl\",\n  \"payoutCallbackUrl\": \"sample_payoutCallbackUrl\",\n  \"isActive\": true,\n  \"userName\": \"sample_userName\"\n}"
             }
           },
           "response": [],
           "event": []
         },
         {
-          "id": "4acc182b-5333-4ed1-bdbd-c79173dafd0f",
+          "id": "8bc25061-abd7-4729-9f12-6326fcedcbbf",
           "name": "Delete User",
           "request": {
             "description": {
@@ -245,7 +662,7 @@
           "event": []
         },
         {
-          "id": "44ee9fb7-1eeb-4c96-b863-6ee474249a46",
+          "id": "de23f25e-d124-4ca7-80fe-71c297a647f1",
           "name": "Get Users",
           "request": {
             "description": {
@@ -302,216 +719,7 @@
       "event": []
     },
     {
-      "id": "c2e8fa23-71ae-4f43-b667-8bd766992b7e",
-      "name": "TRANSACTION",
-      "description": {
-        "content": "Routes for transaction",
-        "type": "text/plain"
-      },
-      "item": [
-        {
-          "id": "c56a8ee9-531a-4165-96ef-af7fc69f9201",
-          "name": "Get Transactions",
-          "request": {
-            "description": {
-              "content": "Controller: getTransactions\nSchema: getTransactionsSchema\n\n### Validation Rules\n| Field | Type | Requirement |\n|---|---|---|\n| page | number | Optional |\n| limit | number | Optional |\n| search | string | Optional |\n| type | string | Optional |\n| status | string | Optional |\n| paymentStatus | string | Optional |\n| startDateFilter | string | Optional |\n| endDateFilter | string | Optional |\n| sortFilter | string | Optional |\n",
-              "type": "text/markdown"
-            },
-            "url": {
-              "path": [
-                "transaction",
-                "all"
-              ],
-              "host": [
-                "{{BASE_URL}}"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                },
-                {
-                  "key": "search",
-                  "value": "sample_search"
-                },
-                {
-                  "key": "type",
-                  "value": "sample_type"
-                },
-                {
-                  "key": "status",
-                  "value": "sample_status"
-                },
-                {
-                  "key": "paymentStatus",
-                  "value": "sample_paymentStatus"
-                },
-                {
-                  "key": "startDateFilter",
-                  "value": "sample_startDateFilter"
-                },
-                {
-                  "key": "endDateFilter",
-                  "value": "sample_endDateFilter"
-                },
-                {
-                  "key": "sortFilter",
-                  "value": "sample_sortFilter"
-                }
-              ],
-              "variable": []
-            },
-            "method": "GET",
-            "body": {}
-          },
-          "response": [],
-          "event": []
-        },
-        {
-          "id": "fa47ae8d-cdee-476f-a762-f14653af32c5",
-          "name": "Get Transactions",
-          "request": {
-            "description": {
-              "content": "Controller: exportTransactions\nSchema: getTransactionsSchema\n\n### Validation Rules\n| Field | Type | Requirement |\n|---|---|---|\n| page | number | Optional |\n| limit | number | Optional |\n| search | string | Optional |\n| type | string | Optional |\n| status | string | Optional |\n| paymentStatus | string | Optional |\n| startDateFilter | string | Optional |\n| endDateFilter | string | Optional |\n| sortFilter | string | Optional |\n",
-              "type": "text/markdown"
-            },
-            "url": {
-              "path": [
-                "transaction",
-                "export"
-              ],
-              "host": [
-                "{{BASE_URL}}"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                },
-                {
-                  "key": "search",
-                  "value": "sample_search"
-                },
-                {
-                  "key": "type",
-                  "value": "sample_type"
-                },
-                {
-                  "key": "status",
-                  "value": "sample_status"
-                },
-                {
-                  "key": "paymentStatus",
-                  "value": "sample_paymentStatus"
-                },
-                {
-                  "key": "startDateFilter",
-                  "value": "sample_startDateFilter"
-                },
-                {
-                  "key": "endDateFilter",
-                  "value": "sample_endDateFilter"
-                },
-                {
-                  "key": "sortFilter",
-                  "value": "sample_sortFilter"
-                }
-              ],
-              "variable": []
-            },
-            "method": "GET",
-            "body": {}
-          },
-          "response": [],
-          "event": []
-        },
-        {
-          "id": "62e04992-75b1-473f-ab78-d24f1ad3d292",
-          "name": "Create Deposit",
-          "request": {
-            "description": {
-              "content": "Controller: createDeposit\nSchema: createDepositSchema\n\n### Validation Rules\n| Field | Type | Requirement |\n|---|---|---|\n| amount | number | Required |\n| orderId | string | Required |\n| customerPhone | string | Required |\n| customerName | string | Optional |\n| customerEmail | string | Optional |\n| returnUrl | string | Optional |\n| notifyUrl | string | Optional |\n| metadata | object | Optional |\n",
-              "type": "text/markdown"
-            },
-            "url": {
-              "path": [
-                "transaction",
-                "payin"
-              ],
-              "host": [
-                "{{BASE_URL}}"
-              ],
-              "query": [],
-              "variable": []
-            },
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "method": "POST",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"amount\": 123,\n  \"orderId\": \"sample_orderId\",\n  \"customerPhone\": \"sample_customerPhone\",\n  \"customerName\": \"sample_customerName\",\n  \"customerEmail\": \"test@example.com\",\n  \"returnUrl\": \"sample_returnUrl\",\n  \"notifyUrl\": \"sample_notifyUrl\",\n  \"metadata\": {}\n}"
-            }
-          },
-          "response": [],
-          "event": []
-        },
-        {
-          "id": "6593308e-a70b-4995-9abb-0e92d78fd081",
-          "name": "Get Transaction Status",
-          "request": {
-            "description": {
-              "content": "Controller: getTransactionStatus\nSchema: getTransactionStatusSchema\n\n### Validation Rules\n| Field | Type | Requirement |\n|---|---|---|\n| orderId | string | Required |\n",
-              "type": "text/markdown"
-            },
-            "url": {
-              "path": [
-                "transaction",
-                "status"
-              ],
-              "host": [
-                "{{BASE_URL}}"
-              ],
-              "query": [
-                {
-                  "key": "orderId",
-                  "value": "sample_orderId"
-                }
-              ],
-              "variable": []
-            },
-            "method": "GET",
-            "body": {}
-          },
-          "response": [],
-          "event": []
-        }
-      ],
-      "event": [],
-      "auth": {
-        "type": "bearer",
-        "bearer": [
-          {
-            "key": "TOKEN",
-            "value": "{{TOKEN}}",
-            "type": "string"
-          }
-        ]
-      }
-    },
-    {
-      "id": "548bddf1-bf57-4752-af94-3468d8ff5e86",
+      "id": "d713eb70-fea4-45bc-8829-90ad30cb6e3f",
       "name": "WALLET",
       "description": {
         "content": "Routes for wallet",
@@ -519,7 +727,7 @@
       },
       "item": [
         {
-          "id": "4cb4d514-ea35-415e-8ca3-dcee68e503e2",
+          "id": "17fdd84e-8624-4a11-819e-ee5966f75306",
           "name": "Get Wallet Activity",
           "request": {
             "description": {
@@ -569,7 +777,7 @@
           "event": []
         },
         {
-          "id": "ddc53112-61b2-4ef7-94fd-62466522ec62",
+          "id": "77a2f35b-7275-4419-bf52-e5a71e646196",
           "name": "Get Balance",
           "request": {
             "description": {
@@ -607,7 +815,7 @@
       }
     },
     {
-      "id": "0f097493-e6e6-491d-acdc-5b50b8045baf",
+      "id": "bed350c9-46e7-4b6e-b36b-8a4f0e782398",
       "name": "WITHDRAW",
       "description": {
         "content": "Routes for withdraw",
@@ -615,7 +823,7 @@
       },
       "item": [
         {
-          "id": "07fcaa2e-df78-4810-81bd-7217a6fe0404",
+          "id": "e71e621f-2f0e-40d3-a877-0f75b2e3c9b3",
           "name": "Manual Withdraw",
           "request": {
             "description": {
@@ -649,7 +857,7 @@
           "event": []
         },
         {
-          "id": "230bb226-4e65-4762-a62b-b88bbfef70c6",
+          "id": "cebf7d87-2803-43d6-8006-3f9eca274846",
           "name": "Quick Paste Withdraw",
           "request": {
             "description": {
@@ -683,7 +891,7 @@
           "event": []
         },
         {
-          "id": "19c7c787-240c-4c59-8a50-c198c1a54845",
+          "id": "e60ead23-e70d-4adb-b5cf-b8e979cd501d",
           "name": "Get Bulk-history",
           "request": {
             "description": {
@@ -721,7 +929,7 @@
       }
     },
     {
-      "id": "3b74ed6c-6857-44c0-9f75-a07abfee96df",
+      "id": "fe952509-9ce2-41d1-ab14-84dd0766ba51",
       "name": "ANALYTICS",
       "description": {
         "content": "Routes for analytics",
@@ -729,7 +937,7 @@
       },
       "item": [
         {
-          "id": "7a685888-e1ad-4ab1-baab-df07e066b0a4",
+          "id": "889a50bc-9576-4069-bd5a-60a9ff7f4af9",
           "name": "Get Volume",
           "request": {
             "description": {
@@ -754,7 +962,7 @@
           "event": []
         },
         {
-          "id": "d800b0bd-1def-41ff-93ca-7609ef89c32a",
+          "id": "c34552d9-1095-4b62-a312-8146b46eb246",
           "name": "Get Chart",
           "request": {
             "description": {
@@ -792,7 +1000,7 @@
       }
     },
     {
-      "id": "a8711954-8f0e-4803-bd93-4681b694d999",
+      "id": "73808b64-1ca0-4ef2-9e0e-df34392a4f5c",
       "name": "DEVELOPER",
       "description": {
         "content": "Routes for developer",
@@ -800,7 +1008,7 @@
       },
       "item": [
         {
-          "id": "449cf2bb-71cb-40fb-9283-b511cdceb796",
+          "id": "1b522973-eda9-44cf-8ab2-9de29d889178",
           "name": "Get Config",
           "request": {
             "description": {
@@ -825,7 +1033,7 @@
           "event": []
         },
         {
-          "id": "89e224a7-fb72-4845-bc39-45023a42476e",
+          "id": "6fda03af-ccb1-4897-b925-89ce5384961b",
           "name": "Update Merchant Config",
           "request": {
             "description": {
@@ -859,7 +1067,7 @@
           "event": []
         },
         {
-          "id": "42fb4f82-6c6b-420d-bc84-27dd82f8d3f8",
+          "id": "61e28c66-7503-4822-82f5-d1e9d4eabc92",
           "name": "Create Regenerate-keys",
           "request": {
             "description": {
@@ -884,7 +1092,7 @@
           "event": []
         },
         {
-          "id": "e07adeb1-2b03-428a-934c-05eab7d42a78",
+          "id": "4f691092-4064-48f0-8c9d-57ea13d69b71",
           "name": "Test Webhook",
           "request": {
             "description": {
@@ -945,8 +1153,8 @@
     }
   ],
   "info": {
-    "_postman_id": "160ebc26-03c8-4a1a-b4a2-12c14edc7bb1",
-    "name": "Delvoura API",
+    "_postman_id": "a3d24d4b-838c-4c83-99c2-53772fe6d723",
+    "name": "Payment Gateway",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "description": {
       "content": "Auto generated API collection",

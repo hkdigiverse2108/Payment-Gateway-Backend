@@ -20,18 +20,12 @@ export const apiAuthMiddleware = async (req: Request, res: Response, next: NextF
     try {
         const user = await userModel.findOne({ apiKey: publicKey, isActive: true, isDeleted: false });
         if (!user) {
-            return res.status(HTTP_STATUS.UNAUTHORIZED).json(new apiResponse(HTTP_STATUS.UNAUTHORIZED, "Invalid API Key", {}, {}));
+            return res.status(HTTP_STATUS.UNAUTHORIZED).json(new apiResponse(HTTP_STATUS.UNAUTHORIZED, "Secret key missing for user", {}, {}));
         }
 
         // Verify HMAC-SHA256 signature
-        const payload = JSON.stringify(req.body);
-        const expectedSignature = crypto
-            .createHmac('sha256', user.secretKey || '')
-            .update(payload)
-            .digest('hex');
-
-        console.log('Received Signature:', signature);
-        console.log('Expected Signature:', expectedSignature);
+        const payload = (req as any).rawBody;
+        const expectedSignature = crypto.createHmac('sha256', user.secretKey || '').update(payload).digest('hex');
 
         if (signature !== expectedSignature) {
             return res.status(HTTP_STATUS.UNAUTHORIZED).json(new apiResponse(HTTP_STATUS.UNAUTHORIZED, "Invalid Signature", {

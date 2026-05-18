@@ -85,7 +85,7 @@ export const getUsers = async (req, res) => {
         const { error, value } = getUsersSchema.validate(req.query || {});
         if (error) return res.status(HTTP_STATUS.BAD_REQUEST).json(new apiResponse(HTTP_STATUS.BAD_REQUEST, error.details[0].message, {}, {}));
 
-        const { criteria, options, page, limit } = resolveSortAndFilter(value, ['userName', 'email', 'mobileNumber']);
+        const { criteria, options, page, limit } = resolveSortAndFilter(value, ['username', 'email', 'mobileNumber']);
 
         if (user?.role === USER_ROLE.USER) {
             criteria._id = isValidObjectId(user._id)

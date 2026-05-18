@@ -18,7 +18,8 @@ export const PAYMENT_STATUS = {
     FAILED: "failed",
     EXPIRED: "expired",
     APPROVED: "approved",
-    PROCESSING: "processing"
+    PROCESSING: "processing",
+    CANCELLED: "cancelled",
 } as const;
 
 export const TRANSACTION_TYPE = {
@@ -42,4 +43,13 @@ export const BULK_UPLOAD_STATUS = {
 export const PAYMENT_METHOD = {
     UPI: "upi",
     QR: "qr"
+} as const;
+
+export const GATEWAY = {
+    CASHFREE: "cashfree",
+    RAZORPAY: "razorpay",
+    PAYU: "payu",
+    PAYTM: "paytm",
+    PHONEPE: "phonepe",
+    STRIPE: "stripe"
 } as const;

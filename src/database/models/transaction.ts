@@ -26,6 +26,7 @@ export interface ITransaction {
     metadata?: any;
     createdAt?: Date;
     updatedAt?: Date;
+    isDeleted?: boolean;
 }
 
 export interface ITransactionDocument extends ITransaction, Document { }
@@ -52,7 +53,8 @@ const transactionSchema = new Schema<ITransactionDocument>({
     remarks: { type: String },
     rejectionReason: { type: String },
     isSandbox: { type: Boolean, default: false },
-    metadata: { type: Schema.Types.Mixed }
+    metadata: { type: Schema.Types.Mixed },
+    isDeleted: { type: Boolean, default: false },
 }, { timestamps: true });
 
 export const transactionModel = mongoose.model<ITransactionDocument>('transaction', transactionSchema);

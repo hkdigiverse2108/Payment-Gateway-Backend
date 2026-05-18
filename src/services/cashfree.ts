@@ -17,6 +17,7 @@ export const createCashfreeOrder = async (orderData: {
         customer_id: string;
         customer_phone: string;
         customer_name?: string;
+        customer_email?: string;
     };
     order_meta?: {
         return_url?: string;

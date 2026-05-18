@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhonePe Payment Success</title>
+</head>
+
+<body>
+
+    <h2 id="status"> Verifying Payment... </h2>
+
+    <script>
+        async function verifyPayment() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+
+                const merchantTransactionId = params.get("txn");
+
+                console.log("TXN:", merchantTransactionId);
+                if (!merchantTransactionId) {
+                    document.getElementById("status").innerHTML = "Transaction ID Missing";
+                    return;
+                }
+                const response = await fetch(
+                    'http://localhost:5000/transaction/verify/phonepe',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-api-key': '80f6a91cdb056628d9f96609294c62da'
+                        },
+                        body: JSON.stringify({
+                            merchantTransactionId
+                        })
+                    }
+                );
+
+                const data = await response.json();
+                console.log(data);
+
+                if (data.status === 200) {
+                    document.getElementById("status").innerHTML ="Payment Successful & Wallet Updated";
+                }else {
+                    document.getElementById("status").innerHTML ="Payment Verification Failed";
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById("status").innerHTML =
+                    "Verification Error";
+            }
+        }
+        verifyPayment();
+    </script>
+</body>
+
+</html>

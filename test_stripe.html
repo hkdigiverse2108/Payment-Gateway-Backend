@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stripe Test Payment</title>
+
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <style>
+        body{
+            font-family: Arial;
+            padding: 40px;
+        }
+
+        #card-element{
+            border: 1px solid #ccc;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        button{
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Stripe Test Payment</h2>
+
+    <div id="card-element"></div>
+
+    <button id="payBtn">
+        Pay
+    </button>
+
+    <p id="result"></p>
+
+    <script>
+
+        // YOUR STRIPE PUBLISHABLE KEY
+        const stripe = Stripe("pk_test_51TXEH2DgUiCg5y2JB6mVFJElESzSKuY3C2D8mDTB5qGJiCeb8YP1h3VFGcirTsAcDGfeFFhR5CS6LE4kozmCrzCi009PGoXjJf");
+
+        // client_secret from POSTMAN response
+        const clientSecret =
+            "pi_3TXJ2ADgUiCg5y2J3ZC2w2kM_secret_kMCzwO1z443dnm36BrFMRHX9L";
+
+        const elements = stripe.elements();
+
+        const card = elements.create("card");
+
+        card.mount("#card-element");
+
+        document
+            .getElementById("payBtn")
+            .addEventListener("click", async () => {
+
+                const result =
+                    await stripe.confirmCardPayment(
+                        clientSecret,
+                        {
+                            payment_method: {
+                                card: card
+                            }
+                        }
+                    );
+
+                if(result.error){
+
+                    document.getElementById("result")
+                        .innerHTML =
+                        result.error.message;
+
+                    console.log(result.error);
+
+                }else{
+
+                    document.getElementById("result")
+                        .innerHTML =
+                        "Payment Success";
+
+                    console.log(result.paymentIntent);
+                }
+            });
+
+    </script>
+
+</body>
+</html>

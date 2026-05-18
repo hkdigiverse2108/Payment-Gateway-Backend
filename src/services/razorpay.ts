@@ -38,7 +38,20 @@ export const getRazorpayOrder = async (orderId: string) => {
     }
 };
 
-// just check work or not , after delete 
+export const verifyRazorpayWebhookSignature = (signature: string, rawBody: string, webhookSecret: string) => {
+    try {
+        const expectedSignature = crypto
+            .createHmac('sha256', webhookSecret)
+            .update(rawBody)
+            .digest('hex');
+        return signature === expectedSignature;
+    } catch (error) {
+        console.error('Razorpay Webhook Verification Failed:', error);
+        return false;
+    }
+};
+
+// just check work or not [live use webhook signature] after delete this
 export const verifyRazorpayPaymentSignature = (orderId: string, paymentId: string, signature: string) => {
     try {
         const secret = process.env.RAZORPAY_KEY_SECRET || '';
@@ -49,19 +62,6 @@ export const verifyRazorpayPaymentSignature = (orderId: string, paymentId: strin
         return generatedSignature === signature;
     } catch (error) {
         console.error('Razorpay Payment Signature Verification Failed:', error);
-        return false;
-    }
-};
-
-export const verifyRazorpayWebhookSignature = (signature: string, rawBody: string, webhookSecret: string) => {
-    try {
-        const expectedSignature = crypto
-            .createHmac('sha256', webhookSecret)
-            .update(rawBody)
-            .digest('hex');
-        return signature === expectedSignature;
-    } catch (error) {
-        console.error('Razorpay Webhook Verification Failed:', error);
         return false;
     }
 };

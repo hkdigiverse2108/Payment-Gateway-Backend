@@ -13,14 +13,16 @@ app.use(mongooseConnection)
 app.use(bodyParser.json({
     limit: '200mb',
     verify: (req: any, res, buf) => {
-        req.rawBody = buf.toString();
+        req.rawBody = buf;
+        req.rawBodyString = buf.toString();
     }
 }))
 app.use(bodyParser.urlencoded({
     limit: '200mb',
     extended: true,
     verify: (req: any, res, buf) => {
-        req.rawBody = buf.toString();
+        req.rawBody = buf;
+        req.rawBodyString = buf.toString();
     }
 }))
 
@@ -43,9 +45,18 @@ app.get('/isServerUp', (req, res) => {
     res.send('Server is running ');
 });
 
+// just testing 
 import path from 'path';
 app.get('/test-rzp', (req, res) => {
     res.sendFile(path.join(process.cwd(), 'test_razorpay.html'));
+});
+
+app.get("/payment-success", (req, res) => {
+    res.sendFile(path.join(process.cwd(), 'payment-success.html'));
+})
+
+app.get('/test-stripe', (req, res) => {
+    res.sendFile( path.join(process.cwd(), 'test_stripe.html') );
 });
 
 app.use(router);

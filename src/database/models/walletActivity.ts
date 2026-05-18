@@ -10,6 +10,7 @@ export interface IWalletActivity {
     newBalance: number;
     description?: string;
     brand?: string;
+    isDeleted?: boolean;
 }
 
 export interface IWalletActivityDocument extends IWalletActivity, Document { }
@@ -22,7 +23,8 @@ const walletActivitySchema = new Schema<IWalletActivityDocument>({
     previousBalance: { type: Number, required: true },
     newBalance: { type: Number, required: true },
     description: { type: String },
-    brand: { type: String }
+    brand: { type: String },
+    isDeleted: { type: Boolean, default: false }
 }, { timestamps: true });
 
 export const walletActivityModel = mongoose.model<IWalletActivityDocument>('walletActivity', walletActivitySchema);

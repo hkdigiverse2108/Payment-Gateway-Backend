@@ -285,7 +285,7 @@ async function syncToPostman(collectionJSON: any) {
 async function main() {
   const collection = new Collection({
     info: {
-      name: "Delvoura API",
+      name: "Payment Gateway",
       description: {
         content: "Auto generated API collection",
         type: "text/plain"
@@ -339,7 +339,7 @@ async function main() {
 
     for (const route of routes) {
       debug(`  Processing route: ${route.method} ${route.path}`);
-      
+
       // Try multiple possible controller locations
       const possibleControllerFiles = [
         path.join(CONTROLLERS_DIR, routerName, 'index.ts'),
@@ -399,7 +399,7 @@ async function main() {
             });
           }
         }
-        
+
         mergedSample = mergeDeep(mergedSample, existingJson);
 
         if (Object.keys(mergedSample).length > 0 || (existingReq && existingReq.body)) {
@@ -427,11 +427,11 @@ async function main() {
       // Query Parameters
       if (route.method === 'GET' || route.method === 'DELETE') {
         const queryParams = result?.sample || {};
-        
+
         // Merge with existing query params from cloud
         if (existingReq && existingReq.url && Array.isArray(existingReq.url.query)) {
           existingReq.url.query.forEach((q: any) => {
-             if (q.key && q.value) queryParams[q.key] = q.value;
+            if (q.key && q.value) queryParams[q.key] = q.value;
           });
         }
 

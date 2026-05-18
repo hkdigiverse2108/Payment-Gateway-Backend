@@ -87,11 +87,22 @@ export const resolveSortAndFilter = (value: any, searchFields: string[] = ['name
   let criteria: any = { isDeleted: false }, options: any = { lean: true };
 
   if (search) {
-    if (searchFields.length === 1) {
-      criteria[searchFields[0]] = { $regex: search, $options: 'si' };
-    } else {
-      criteria.$or = searchFields.map(field => ({ [field]: { $regex: search, $options: 'si' } }));
-    }
+    const orConditions: any[] = [];
+    searchFields.forEach((field) => {
+      if (field === 'mobileNumber') {
+        if (!isNaN(Number(search))) { orConditions.push({ mobileNumber: Number(search) }); }
+      }
+      else if (field === '_id') {
+        if (isValidObjectId(search)) { orConditions.push({ _id: search }); }
+      }
+      else {
+        orConditions.push({ [field]: { $regex: search, $options: 'i' }
+        });
+      }
+    });
+
+    if (isValidObjectId(search)) { orConditions.push({ _id: search }); }
+    criteria.$or = orConditions;
   }
 
   if (activeFilter === true) criteria.isActive = true;

@@ -5,19 +5,19 @@ import { changePasswordSchema, loginSchema } from '../../validation';
 
 export const login = async (req, res) => {
     reqInfo(req);
+
     try {
         const { error, value } = loginSchema.validate(req.body);
         if (error) return res.status(HTTP_STATUS.BAD_REQUEST).json(new apiResponse(HTTP_STATUS.BAD_REQUEST, error.details[0].message, {}, {}));
 
+        const identifier = value.username?.trim();
         const user = await getFirstMatch(userModel, {
             $or: [
-                { username: value.username },
-                { email: value.username?.toLowerCase() }
+                { username: { $regex: `^${identifier}$`, $options: 'i' } },
+                { email: identifier?.toLowerCase() }
             ],
             isDeleted: false
-        }, {}, {})
-
-        console.log("user", user);
+        });
 
         if (!user) return res.status(HTTP_STATUS.UNAUTHORIZED).json(new apiResponse(HTTP_STATUS.UNAUTHORIZED, responseMessage.invalidCredentials(value.username), {}, {}));
 
@@ -47,7 +47,7 @@ export const changePassword = async (req, res) => {
         const { error, value } = changePasswordSchema.validate(req.body || {});
         if (error) return res.status(HTTP_STATUS.BAD_REQUEST).json(new apiResponse(HTTP_STATUS.BAD_REQUEST, error.details[0].message, {}, {}));
 
-        const userData = await getFirstMatch(userModel, { _id: isValidObjectId(value.userId), isDeleted: false }, {}, {});
+        const userData = await getFirstMatch(userModel, { _id: isValidObjectId(value.userId), isDeleted: false }, {}, {lean: false});
         if (!userData) return res.status(HTTP_STATUS.NOT_FOUND).json(new apiResponse(HTTP_STATUS.NOT_FOUND, responseMessage.invalidUserEmail, {}, {}));
 
         const isMatch = await compareHash(value.oldPassword, userData.password);
