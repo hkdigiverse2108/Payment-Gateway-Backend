@@ -51,5 +51,6 @@ export const GATEWAY = {
     PAYU: "payu",
     PAYTM: "paytm",
     PHONEPE: "phonepe",
-    STRIPE: "stripe"
+    STRIPE: "stripe",
+    CCAVENUE: "ccavenue"
 } as const;

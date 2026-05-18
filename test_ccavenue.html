@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CCAvenue Sandbox Payment Simulator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0f172a;
+      font-family: 'Outfit', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: #e2e8f0;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 520px;
+      background: #1e293b;
+      padding: 35px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #10b981, #3b82f6);
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 8px;
+      color: #10b981;
+      font-weight: 700;
+      font-size: 26px;
+      letter-spacing: -0.5px;
+    }
+
+    p.subtitle {
+      text-align: center;
+      font-size: 14px;
+      color: #94a3b8;
+      margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      margin-top: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #cbd5e1;
+    }
+
+    textarea, input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      background: #0f172a;
+      color: #ffffff;
+      box-sizing: border-box;
+      font-family: inherit;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    textarea:focus, input:focus {
+      border-color: #10b981;
+      outline: none;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+    }
+
+    textarea {
+      height: 100px;
+      resize: vertical;
+    }
+
+    .btn-primary {
+      width: 100%;
+      margin-top: 25px;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    /* Mock Gateway Interface Overlay */
+    .mock-overlay {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #1e293b;
+      padding: 35px;
+      box-sizing: border-box;
+      z-index: 10;
+      flex-direction: column;
+      animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+
+    .mock-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 15px;
+      margin-bottom: 25px;
+    }
+
+    .mock-logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: #3b82f6;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mock-logo span {
+      color: #10b981;
+    }
+
+    .mock-badge {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid #f59e0b;
+      color: #f59e0b;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .mock-details {
+      background: #0f172a;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .detail-row:last-child {
+      margin-bottom: 0;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .label {
+      color: #94a3b8;
+    }
+
+    .value {
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .amount-value {
+      font-size: 20px;
+      color: #10b981 !important;
+      font-weight: 700;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 15px;
+      margin-top: auto;
+    }
+
+    .btn-success {
+      flex: 1;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-danger {
+      flex: 1;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-success:hover {
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .btn-danger:hover {
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .error-msg {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-top: 15px;
+      display: none;
+    }
+
+    .note {
+      margin-top: 25px;
+      font-size: 12px;
+      color: #64748b;
+      text-align: center;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>CCAvenue Payment Simulator</h2>
+  <p class="subtitle">Enter backend deposit values to start local sandbox checkout</p>
+
+  <div id="initForm">
+    <label for="encRequest">encRequest</label>
+    <textarea id="encRequest" placeholder="Paste the encrypted encRequest received from /transaction/payin response..." required></textarea>
+
+    <label for="access_code">access_code (optional)</label>
+    <input type="text" id="access_code" placeholder="Paste the access_code received..." />
+
+    <button type="button" class="btn-primary" onclick="launchMockGateway()">Pay Now</button>
+    <div id="errorBox" class="error-msg"></div>
+  </div>
+
+  <!-- Mock CCAvenue Gateway Screen Overlay -->
+  <div id="mockGateway" class="mock-overlay">
+    <div class="mock-header">
+      <div class="mock-logo">CCAvenue <span>Mock</span></div>
+      <div class="mock-badge">Test Sandbox</div>
+    </div>
+
+    <p style="font-size: 14px; color: #94a3b8; margin: 0 0 20px 0;">
+      Successfully decrypted transaction request. Please simulate payment outcome below:
+    </p>
+
+    <div class="mock-details">
+      <div class="detail-row">
+        <span class="label">Merchant ID</span>
+        <span class="value" id="mockMerchantId">4445554</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Transaction Ref ID</span>
+        <span class="value" id="mockTraId">AVIE92NE51BL87EILB</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Payment Purpose</span>
+        <span class="value">Wallet Deposit</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Amount</span>
+        <span class="value amount-value" id="mockAmount">₹ 1.00</span>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn-success" onclick="processMockPayment('Success')">Simulate Success</button>
+      <button class="btn-danger" onclick="processMockPayment('Failure')">Simulate Failure</button>
+    </div>
+  </div>
+
+  <div class="note">
+    This simulator connects directly to your local backend to decrypt <code>encRequest</code>, displays mock parameters, and triggers the database callback pipeline automatically.
+  </div>
+</div>
+
+<!-- Hidden form that simulates final browser POST redirection to our real webhook callback -->
+<form id="hiddenWebhookForm" method="post" action="http://localhost:5000/transaction/webhook/ccavenue" style="display:none;">
+  <input type="hidden" name="encResp" id="hiddenEncResp" />
+</form>
+
+<script>
+  let currentOrderId = '';
+  let currentAmount = '0.00';
+
+  async function launchMockGateway() {
+    const encRequest = document.getElementById('encRequest').value.trim();
+    const errorBox = document.getElementById('errorBox');
+    errorBox.style.display = 'none';
+
+    if (!encRequest) {
+      showError("Please enter the encRequest parameter first.");
+      return;
+    }
+
+    try {
+      // 1. Send the encRequest to our local mock-decrypt helper
+      const response = await fetch('http://localhost:5000/transaction/ccavenue/mock-decrypt', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ encRequest })
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to decrypt. Ensure backend is running.");
+      }
+
+      // 2. Populate mock screen details
+      currentOrderId = data.order_id;
+      currentAmount = data.amount;
+
+      document.getElementById('mockTraId').innerText = currentOrderId;
+      document.getElementById('mockAmount').innerText = '₹ ' + Number(currentAmount).toFixed(2);
+
+      // 3. Reveal Mock Gateway Interface
+      document.getElementById('mockGateway').style.display = 'flex';
+
+    } catch (err) {
+      console.error(err);
+      showError(err.message || "Unable to decrypt encRequest. Please check that the local server is running on port 5000.");
+    }
+  }
+
+  async function processMockPayment(outcome) {
+    try {
+      // 1. Get the encrypted response payload from our local helper
+      const response = await fetch('http://localhost:5000/transaction/ccavenue/mock-encrypt', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          order_id: currentOrderId,
+          amount: currentAmount,
+          order_status: outcome
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to generate mock response.");
+      }
+
+      // 2. Set encResp and submit form directly to simulating a browser callback post redirect
+      document.getElementById('hiddenEncResp').value = data.encResp;
+      document.getElementById('hiddenWebhookForm').submit();
+
+    } catch (err) {
+      alert("Error completing payment: " + err.message);
+    }
+  }
+
+  function showError(msg) {
+    const box = document.getElementById('errorBox');
+    box.innerText = msg;
+    box.style.display = 'block';
+  }
+</script>
+
+</body>
+</html>

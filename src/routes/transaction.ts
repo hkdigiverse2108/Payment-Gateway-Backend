@@ -24,6 +24,11 @@ router.post('/verify/paytm', transactionController.verifyPaytmPayment);
 
 router.post( '/webhook/stripe', transactionController.stripeWebhook );
 
+router.post('/webhook/ccavenue', transactionController.ccavenueWebhook);
+// [live me remove both] for testccavenue
+router.post('/ccavenue/mock-decrypt', transactionController.ccavenueMockDecrypt);
+router.post('/ccavenue/mock-encrypt', transactionController.ccavenueMockEncrypt);
+
 router.post('/payin', apiAuthMiddleware, transactionController.createDeposit);
 router.get('/status', apiAuthMiddleware, transactionController.getTransactionStatus);
 

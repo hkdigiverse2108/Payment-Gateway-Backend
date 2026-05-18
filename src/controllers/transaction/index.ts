@@ -149,6 +149,16 @@ export const createDeposit = async (req, res) => {
                 customerEmail: value.customerEmail,
                 customerName: value.customerName,
             });
+        } else if (value.gateway === GATEWAY.CCAVENUE) {
+            gatewayResponse = await paymentService.createCcavenueOrder({
+                order_id: traId,
+                amount: value.amount,
+                customer_phone: value.customerPhone,
+                customer_name: value.customerName,
+                customer_email: value.customerEmail,
+                redirect_url: `${process.env.BASE_URL}/transaction/webhook/ccavenue`,
+                cancel_url: `${process.env.BASE_URL}/transaction/webhook/ccavenue`,
+            });
         } else {
             return res.status(HTTP_STATUS.BAD_REQUEST).json(new apiResponse(HTTP_STATUS.BAD_REQUEST, "Invalid gateway", {}, {}));
         }
@@ -839,4 +849,149 @@ export const stripeWebhook = async (req, res) => {
         return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send('Webhook Error');
     }
 };
+
+// ====================== CCAvenue ==================================
+export const ccavenueWebhook = async (req, res) => {
+    reqInfo(req);
+    try {
+        const { encResp } = req.body;
+
+        if (!encResp) {
+            console.error('CCAvenue Webhook: Missing encResp in body');
+            return res.status(HTTP_STATUS.BAD_REQUEST).send('Missing encrypted response');
+        }
+
+        const workingKey = process.env.CCAVENUE_WORKING_KEY || '';
+        if (!workingKey) {
+            console.error('CCAvenue Webhook: CCAVENUE_WORKING_KEY is not defined');
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send('Server configuration error');
+        }
+
+        // Decrypt the response from CCAvenue
+        const decrypted = paymentService.decrypt(encResp, workingKey);
+        console.log('CCAvenue Decrypted Webhook Response:', decrypted);
+
+        const decryptedParams = new URLSearchParams(decrypted);
+        const orderId = decryptedParams.get('order_id');
+        const orderStatus = decryptedParams.get('order_status');
+        const trackingId = decryptedParams.get('tracking_id');
+
+        if (!orderId) {
+            console.error('CCAvenue Webhook: Missing order_id in decrypted payload');
+            return res.status(HTTP_STATUS.BAD_REQUEST).send('Invalid response payload');
+        }
+
+        const transaction = await transactionModel.findOne({ traId: orderId });
+        if (!transaction) {
+            console.error(`CCAvenue Webhook: Transaction not found for traId ${orderId}`);
+            return res.status(HTTP_STATUS.NOT_FOUND).send('Transaction not found');
+        }
+
+        if (transaction.status !== ORDER_STATUS.PENDING) {
+            console.log(`CCAvenue Webhook: Transaction ${orderId} already processed with status ${transaction.status}`);
+            const returnUrl = transaction.metadata?.returnUrl;
+            if (returnUrl) {
+                return res.redirect(`${returnUrl}?order_id=${transaction.orderId}&status=${transaction.status}`);
+            }
+            return res.status(HTTP_STATUS.OK).send('Already processed');
+        }
+
+        const responseAmount = Number(decryptedParams.get('amount'));
+        if (responseAmount !== transaction.amount) {
+            return res.status(HTTP_STATUS.BAD_REQUEST).send('Amount mismatch');
+        }
+
+        if (orderStatus === 'Success') {
+            transaction.status = ORDER_STATUS.SUCCESS;
+            transaction.paymentStatus = PAYMENT_STATUS.SUCCESS;
+            transaction.utr = trackingId || 'ccavenue-utr';
+            await transaction.save();
+
+            const user = await userModel.findOne({ _id: transaction.userId });
+            if (user) {
+                const previousBalance = user.walletBalance || 0;
+                user.walletBalance = previousBalance + transaction.amount;
+                await user.save();
+
+                await createData(walletActivityModel, {
+                    userId: user._id,
+                    transactionId: transaction._id,
+                    type: WALLET_ACTIVITY_TYPE.CREDIT,
+                    amount: transaction.amount,
+                    previousBalance: previousBalance,
+                    newBalance: user.walletBalance,
+                    description: `Wallet credited for CCAvenue deposit ${transaction.orderId}`,
+                    brand: transaction.brand
+                });
+            }
+            console.log(`CCAvenue Payment SUCCESS for Transaction ID: ${transaction.traId}`);
+        } else {
+            transaction.status = ORDER_STATUS.FAILED;
+            transaction.paymentStatus = PAYMENT_STATUS.FAILED;
+            await transaction.save();
+            console.log(`CCAvenue Payment FAILED/CANCELLED for Transaction ID: ${transaction.traId}. Status was: ${orderStatus}`);
+        }
+
+        const returnUrl = transaction.metadata?.returnUrl;
+        if (returnUrl) {
+            return res.redirect(`${returnUrl}?order_id=${transaction.orderId}&status=${transaction.status}`);
+        }
+
+        return res.status(HTTP_STATUS.OK).json(
+            new apiResponse( HTTP_STATUS.OK, `Payment processed with status: ${transaction.status}`,
+                {
+                    orderId: transaction.orderId,
+                    traId: transaction.traId,
+                    status: transaction.status,
+                    paymentStatus: transaction.paymentStatus
+                },
+                {}
+            )
+        );
+    } catch (error: any) {
+        console.error('CCAvenue Webhook Error:', error);
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send('Internal Server Error');
+    }
+};
+
+// Dev-only Mock helper to decrypt encRequest for browser testing [live -- remove]
+export const ccavenueMockDecrypt = async (req, res) => {
+    try {
+        const { encRequest } = req.body;
+        if (!encRequest) return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: "Missing encRequest" });
+        
+        const workingKey = process.env.CCAVENUE_WORKING_KEY || '';
+        if (!workingKey) return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Missing Working Key in env" });
+
+        const decrypted = paymentService.decrypt(encRequest, workingKey);
+        
+        const params = new URLSearchParams(decrypted);
+        const order_id = params.get('order_id');
+        const amount = params.get('amount');
+        
+        return res.status(HTTP_STATUS.OK).json({ order_id, amount });
+    } catch (error: any) {
+        console.error("Mock Decrypt Error:", error);
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    }
+};
+
+// Dev-only Mock helper to encrypt parameters into encResp for browser testing [live -- remove]
+export const ccavenueMockEncrypt = async (req, res) => {
+    try {
+        const { order_id, amount, order_status } = req.body;
+        const workingKey = process.env.CCAVENUE_WORKING_KEY || '';
+        if (!workingKey) return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Missing Working Key in env" });
+        
+        const trackingId = `MOCK_CCAV_${Date.now()}`;
+        const plainParams = `order_id=${order_id}&order_status=${order_status}&amount=${amount}&tracking_id=${trackingId}&bank_ref_no=BANK_${Date.now()}&payment_mode=UPI`;
+        
+        const encResp = paymentService.encrypt(plainParams, workingKey);
+        return res.status(HTTP_STATUS.OK).json({ encResp });
+    } catch (error: any) {
+        console.error("Mock Encrypt Error:", error);
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    }
+};
+
 
