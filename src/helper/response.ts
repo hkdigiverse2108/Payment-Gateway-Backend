@@ -46,4 +46,18 @@ export const responseMessage = {
     deleteDataSuccess: (message: string): string => { return `${message} deleted successfully!` },
     deleteDataError: (message: string): string => { return `Error while deleting ${message}!` },
     dataAlreadyExist: (message: string): string => { return `${message} already exist!` },
+
+    // Support System Messages
+    ticketCreated: "Support ticket created successfully!",
+    ticketNotFound: "Support ticket not found!",
+    ticketAlreadyResolved: "This ticket has already been resolved!",
+    ticketAlreadyClosed: "This ticket has already been closed!",
+    ticketEscalated: "Your issue has been escalated to our support team. An admin will assist you shortly.",
+    ticketClosed: "Ticket closed successfully!",
+    ticketUpdated: "Ticket updated successfully!",
+    messageNotFound: "Message not found!",
+    messageSent: "Message sent successfully!",
+    messagesMarkedRead: "Messages marked as read!",
+    adminReplySent: "Admin reply sent successfully!",
+    cannotMessageClosedTicket: "Cannot send messages to a closed ticket!",
 };

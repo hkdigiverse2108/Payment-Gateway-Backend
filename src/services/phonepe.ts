@@ -8,7 +8,7 @@ dotenv.config();
 const clientId = process.env.PHONEPE_CLIENT_ID ?? '';
 const clientSecret = process.env.PHONEPE_CLIENT_SECRET ?? '';
 const clientVersion = 1; // PhonePe Node SDK typically expects version as 1
-const env = process.env.NODE_ENV === 'production' ? Env.PRODUCTION : Env.SANDBOX;
+const env = process.env.ENVIRONMENT === 'prod' ? Env.PRODUCTION : Env.SANDBOX;
 
 const phonePeClient = StandardCheckoutClient.getInstance(clientId, clientSecret, clientVersion, env);
 
@@ -32,7 +32,9 @@ interface PhonePeOrderResponse {
 export async function createPhonePeOrder(params: PhonePeOrderParams): Promise<PhonePeOrderResponse> {
   const merchantTransactionId = `PP-${params.orderId}-${Date.now()}`;
   const amountInPaise = params.amount * 100; // SDK requires amount in paise
-  const redirectUrl = process.env.PHONEPE_REDIRECT_URL;
+
+  const baseRedirectUrl = process.env.PHONEPE_REDIRECT_URL || '';
+  const redirectUrl = `${baseRedirectUrl}?txn=${encodeURIComponent(merchantTransactionId)}`;
 
   const request = StandardCheckoutPayRequest.builder()
     .merchantOrderId(merchantTransactionId)
@@ -72,7 +74,14 @@ export function verifyPhonePeWebhookSignature(
       .createHmac('sha256', secret)
       .update(rawBody)
       .digest('hex');
-    return expectedSignature === signatureHeader;
+      
+    if (expectedSignature === signatureHeader) return true;
+    
+    if (process.env.BYPASS_WEBHOOK_SIGNATURES === 'true' && process.env.ENVIRONMENT !== 'prod') {
+        console.warn('Bypassing PhonePe webhook signature verification in Sandbox environment for testing.');
+        return true;
+    }
+    return false;
   } catch (error) {
     console.error('PhonePe Webhook Signature Verify Error:', error);
     return false;

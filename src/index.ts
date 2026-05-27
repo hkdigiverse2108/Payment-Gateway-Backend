@@ -5,6 +5,8 @@ import cors from 'cors'
 import { mongooseConnection } from './database'
 import * as packageInfo from '../package.json'
 import { router } from './routes'
+import { connectRedis } from './database/redis';
+import { initializeSocket } from './services/socket';
 
 const app = express();
 
@@ -55,8 +57,8 @@ app.get("/payment-success", (req, res) => {
     res.sendFile(path.join(process.cwd(), 'payment-success.html'));
 })
 
-app.get('/test-stripe', (req, res) => {
-    res.sendFile( path.join(process.cwd(), 'test_stripe.html') );
+app.get('/test-ccavenue', (req, res) => {
+    res.sendFile( path.join(process.cwd(), 'test_ccavenue.html') );
 });
 
 app.use(router);
@@ -65,5 +67,10 @@ app.all(/.*/, bad_gateway);
 
 const server = new http.Server(app);
 
+// Initialize Socket.IO for real-time support chat
+initializeSocket(server);
+
+connectRedis();
 
 export default server;
+

@@ -44,7 +44,17 @@ export const verifyRazorpayWebhookSignature = (signature: string, rawBody: strin
             .createHmac('sha256', webhookSecret)
             .update(rawBody)
             .digest('hex');
-        return signature === expectedSignature;
+        // if (signature === expectedSignature);
+        
+        // Failed testing Code
+        if (signature === expectedSignature) return true;
+        
+        if (process.env.BYPASS_WEBHOOK_SIGNATURES === 'true' && process.env.ENVIRONMENT !== 'prod') {
+            console.warn('Bypassing Razorpay webhook signature verification in Sandbox environment for testing.');
+            return true; // Bypass in Sandbox
+        }
+        return false;
+
     } catch (error) {
         console.error('Razorpay Webhook Verification Failed:', error);
         return false;

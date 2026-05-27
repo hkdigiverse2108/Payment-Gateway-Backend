@@ -7,6 +7,7 @@ import { walletRouter } from './wallet'
 import { withdrawRouter } from './withdraw'
 import { analyticsRouter } from './analytics'
 import { developerRouter } from './developer'
+import { supportRouter } from './support'
 import { userJWT } from '../helper'
 
 const router = Router()
@@ -20,5 +21,6 @@ router.use('/wallet', walletRouter)
 router.use('/withdraw', withdrawRouter)
 router.use('/analytics', analyticsRouter)
 router.use('/developer', developerRouter)
+router.use('/support', supportRouter)
 
 export { router }

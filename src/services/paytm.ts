@@ -89,7 +89,6 @@ export async function getPaytmOrderStatus(merchantTransactionId: string) {
         mid: MID,
         orderId: merchantTransactionId,
     };
-
     try {
         const checksum = await PaytmChecksum.generateSignature(JSON.stringify(paytmParams.body), MERCHANT_KEY);
         paytmParams.head = { signature: checksum };

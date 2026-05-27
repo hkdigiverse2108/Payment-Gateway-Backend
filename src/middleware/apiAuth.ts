@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
 import { userModel } from '../database';
-import { apiResponse, HTTP_STATUS } from '../common';
-import { reqInfo } from '../helper';
+import { redisClient } from '../database/redis';
+import { HTTP_STATUS } from '../common';
+import { reqInfo, apiResponse } from '../helper';
 
 export const apiAuthMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     reqInfo(req);
@@ -18,9 +19,21 @@ export const apiAuthMiddleware = async (req: Request, res: Response, next: NextF
     }
 
     try {
-        const user = await userModel.findOne({ apiKey: publicKey, isActive: true, isDeleted: false });
-        if (!user) {
-            return res.status(HTTP_STATUS.UNAUTHORIZED).json(new apiResponse(HTTP_STATUS.UNAUTHORIZED, "Secret key missing for user", {}, {}));
+        const cacheKey = `apiKey:${publicKey}`;
+        let user: any;
+
+        // Try to get user from Redis cache
+        const cachedUser = await redisClient.get(cacheKey);
+        if (cachedUser) {
+            user = JSON.parse(cachedUser.toString());
+        } else {
+            // Cache Miss: Query MongoDB
+            user = await userModel.findOne({ apiKey: publicKey, isActive: true, isDeleted: false }).lean();
+            if (!user) {
+                return res.status(HTTP_STATUS.UNAUTHORIZED).json(new apiResponse(HTTP_STATUS.UNAUTHORIZED, "Secret key missing for user", {}, {}));
+            }
+            // Save to Redis cache for 10 minutes
+            await redisClient.setEx(cacheKey, 600, JSON.stringify(user));
         }
 
         // Verify HMAC-SHA256 signature
@@ -33,7 +46,6 @@ export const apiAuthMiddleware = async (req: Request, res: Response, next: NextF
                 expected: expectedSignature
             }, {}));
         }
-
         (req as any).user = user;
         next();
     } catch (error: any) {

@@ -1,5 +1,7 @@
 import { Cashfree, CFEnvironment } from 'cashfree-pg';
 import dotenv from 'dotenv';
+import crypto from 'crypto';
+import { redisGet, redisSet } from '../helper/database-service';
 
 dotenv.config();
 
@@ -37,10 +39,18 @@ export const createCashfreeOrder = async (orderData: {
 
 export const getOrder = async (orderId: string) => {
     try {
+        const cacheKey = `cashfree:order:${orderId}`;
+        const cachedOrder = await redisGet(cacheKey);
+        if (cachedOrder) { return cachedOrder; }
         const response = await cashfree.PGFetchOrder(orderId);
+
+        await redisSet(cacheKey, response.data, 300);
         return response.data;
     } catch (error: any) {
-        console.error('Cashfree Get Order Error:', error.response?.data || error.message);
+        console.error(
+            'Cashfree Get Order Error:',
+            error.response?.data || error.message
+        );
         throw error;
     }
 };
@@ -51,6 +61,22 @@ export const verifyCashfreeWebhookSignature = (signature: string, rawBody: strin
         return true;
     } catch (error) {
         console.error('Webhook Signature Verification Failed:', error);
+        
+           // Manual verification fallback- Using this code Failed show 
+        try {
+            const secretKey = process.env.CASHFREE_SECRET_KEY || '';
+            const data = timestamp + rawBody;
+            const expectedSignature = crypto.createHmac('sha256', secretKey).update(data).digest('base64');
+            if (expectedSignature === signature) return true;
+            console.error(`Manual verification also failed. Expected: ${expectedSignature}, Received: ${signature}`);
+        } catch (err) {
+            console.error('Manual signature generation error:', err);
+        }
+        if (process.env.BYPASS_WEBHOOK_SIGNATURES === 'true' && process.env.ENVIRONMENT !== 'prod') {
+            console.warn('Bypassing Cashfree webhook signature verification in Sandbox environment for testing.');
+            return true; // Bypass in Sandbox
+        }
+
         return false;
     }
 };

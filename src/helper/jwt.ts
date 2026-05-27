@@ -1,9 +1,10 @@
 import jwt from 'jsonwebtoken'
-import { apiResponse, HTTP_STATUS, isValidObjectId } from '../common'
+import { HTTP_STATUS, isValidObjectId } from '../common'
 import { Request, Response } from 'express'
 import { responseMessage } from './response'
 import { getFirstMatch } from './database-service';
 import { userModel } from '../database';
+import { apiResponse} from "../helper";
 
 const jwt_token_secret = process.env.JWT_TOKEN_SECRET;
 

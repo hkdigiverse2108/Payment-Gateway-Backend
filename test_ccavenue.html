@@ -275,9 +275,16 @@
     <label for="access_code">access_code (optional)</label>
     <input type="text" id="access_code" placeholder="Paste the access_code received..." />
 
-    <button type="button" class="btn-primary" onclick="launchMockGateway()">Pay Now</button>
+    <button type="button" class="btn-primary" onclick="launchMockGateway()">Simulate Locally (Mock)</button>
+    <button type="button" class="btn-primary" style="background: linear-gradient(135deg, #3b82f6, #2563eb); margin-top: 10px;" onclick="submitOriginal()">Open Original CCAvenue</button>
     <div id="errorBox" class="error-msg"></div>
   </div>
+
+  <!-- Form for original CCAvenue submission -->
+  <form id="originalForm" method="post" action="https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction" style="display: none;">
+    <input type="hidden" name="encRequest" id="origEncRequest" />
+    <input type="hidden" name="access_code" id="origAccessCode" />
+  </form>
 
   <!-- Mock CCAvenue Gateway Screen Overlay -->
   <div id="mockGateway" class="mock-overlay">
@@ -297,7 +304,7 @@
       </div>
       <div class="detail-row">
         <span class="label">Transaction Ref ID</span>
-        <span class="value" id="mockTraId">AVIE92NE51BL87EILB</span>
+        <span class="value" id="mockTraId">DEPB6B728D991FD</span>
       </div>
       <div class="detail-row">
         <span class="label">Payment Purpose</span>
@@ -403,6 +410,22 @@
     const box = document.getElementById('errorBox');
     box.innerText = msg;
     box.style.display = 'block';
+  }
+
+  function submitOriginal() {
+    const encRequest = document.getElementById('encRequest').value.trim();
+    const accessCode = document.getElementById('access_code').value.trim();
+    const errorBox = document.getElementById('errorBox');
+    errorBox.style.display = 'none';
+
+    if (!encRequest || !accessCode) {
+      showError("Please enter both encRequest and access_code to go to the original page.");
+      return;
+    }
+
+    document.getElementById('origEncRequest').value = encRequest;
+    document.getElementById('origAccessCode').value = accessCode;
+    document.getElementById('originalForm').submit();
   }
 </script>
 

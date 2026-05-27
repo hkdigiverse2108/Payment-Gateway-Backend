@@ -1,6 +1,6 @@
 import { transactionModel, walletActivityModel, userModel, bulkUploadModel } from '../../database';
-import { apiResponse, HTTP_STATUS, TRANSACTION_TYPE, WALLET_ACTIVITY_TYPE, ORDER_STATUS, PAYMENT_STATUS, BULK_UPLOAD_STATUS } from '../../common';
-import { reqInfo, responseMessage, createData, getFirstMatch, updateData, getData } from '../../helper';
+import { HTTP_STATUS, TRANSACTION_TYPE, WALLET_ACTIVITY_TYPE, ORDER_STATUS, PAYMENT_STATUS, BULK_UPLOAD_STATUS } from '../../common';
+import { reqInfo, responseMessage, createData, getFirstMatch, updateData, getData, redisGet, redisSet, redisDelPattern, apiResponse } from '../../helper';
 import crypto from 'crypto';
 import { manualWithdrawSchema, quickPasteWithdrawSchema } from '../../validation';
 
@@ -9,7 +9,6 @@ export const manualWithdraw = async (req, res) => {
     try {
         const { error, value } = manualWithdrawSchema.validate(req.body || {});
         if (error) return res.status(HTTP_STATUS.BAD_REQUEST).json(new apiResponse(HTTP_STATUS.BAD_REQUEST, error.details[0].message, {}, {}));
-
         const { amount, bankName, accountNumber, ifscCode, accountHolderName, branch } = value;
 
         // Check balance
@@ -47,7 +46,10 @@ export const manualWithdraw = async (req, res) => {
             newBalance,
             description: `Manual Withdrawal Request - ${orderId}`
         });
-
+        await redisDelPattern(`wallet:balance:${req.user._id}`);
+        await redisDelPattern(`wallet:activity:${req.user._id}:*`);
+        await redisDelPattern('transactions:list:*');
+        await redisDelPattern('transactions:export:*');
         return res.status(HTTP_STATUS.CREATED).json(new apiResponse(HTTP_STATUS.CREATED, "Withdrawal request submitted successfully", transaction, {}));
     } catch (error) {
         console.error(error);
@@ -62,6 +64,13 @@ export const quickPasteWithdraw = async (req, res) => {
         if (error) return res.status(HTTP_STATUS.BAD_REQUEST).json(new apiResponse(HTTP_STATUS.BAD_REQUEST, error.details[0].message, {}, {}));
 
         const { pasteData } = value;
+        const inputHash = crypto.createHash('sha256').update(pasteData).digest('hex');
+        const cacheKey = `withdraw:quickpaste:${inputHash}`;
+
+        const cached = await redisGet(cacheKey);
+        if (cached) {
+            return res.status(HTTP_STATUS.OK).json(new apiResponse(HTTP_STATUS.OK, "Parsed data", cached, {}));
+        }
 
         const lines = pasteData.split('\n').filter(l => l.trim());
         const results: any[] = [];
@@ -80,7 +89,7 @@ export const quickPasteWithdraw = async (req, res) => {
                 });
             }
         }
-
+        await redisSet(cacheKey, results, 300);
         return res.status(HTTP_STATUS.OK).json(new apiResponse(HTTP_STATUS.OK, "Parsed data", results, {}));
     } catch (error) {
         console.error(error);
@@ -92,9 +101,14 @@ export const getBulkHistory = async (req, res) => {
     reqInfo(req);
     try {
         const criteria: any = { isDeleted: false };
+        const cacheKey = req.user && req.user.role === 'user' ? `bulk:history:${req.user._id}` : 'bulk:history:admin';
         if (req.user && req.user.role === 'user') criteria.userId = req.user._id;
 
+        const cached = await redisGet(cacheKey);
+        if (cached) { return res.status(HTTP_STATUS.OK).json(new apiResponse(HTTP_STATUS.OK, "Bulk history fetched", cached, {})); }
+
         const data = await getData(bulkUploadModel, criteria, {}, { sort: { createdAt: -1 } });
+        await redisSet(cacheKey, data, 300);
         return res.status(HTTP_STATUS.OK).json(new apiResponse(HTTP_STATUS.OK, "Bulk history fetched", data, {}));
     } catch (error) {
         console.error(error);

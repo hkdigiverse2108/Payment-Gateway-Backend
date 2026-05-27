@@ -1,6 +1,6 @@
 import { walletActivityModel, userModel } from '../../database';
-import { apiResponse, HTTP_STATUS, resolveSortAndFilter, USER_ROLE, WALLET_ACTIVITY_TYPE } from '../../common';
-import { reqInfo, responseMessage, getDataWithSorting, countData, getFirstMatch } from '../../helper';
+import { HTTP_STATUS, resolveSortAndFilter, USER_ROLE, WALLET_ACTIVITY_TYPE } from '../../common';
+import { reqInfo, responseMessage, getDataWithSorting, countData, getFirstMatch, redisGet, redisSet, apiResponse } from '../../helper';
 import { getWalletActivitySchema } from '../../validation';
 
 export const getWalletActivity = async (req, res) => {
@@ -11,6 +11,15 @@ export const getWalletActivity = async (req, res) => {
 
         const { criteria, options, page, limit } = resolveSortAndFilter(value, ['description', 'brand']);
 
+        const cacheUserKey = req.user && req.user.role === USER_ROLE.USER ? req.user._id : 'admin';
+        const queryKey = Object.keys(value || {}).sort().map((key) => `${key}=${JSON.stringify(value[key])}`).join('&') || 'all';
+        const cacheKey = `wallet:activity:${cacheUserKey}:${queryKey}`;
+
+        const cached = await redisGet(cacheKey);
+        if (cached) {
+            return res.status(HTTP_STATUS.OK).json(new apiResponse(HTTP_STATUS.OK, responseMessage.getDataSuccess("Wallet Activity"), cached, {}));
+        }
+
         if (req.user && req.user.role === USER_ROLE.USER) {
             criteria.userId = req.user._id;
         }
@@ -19,18 +28,13 @@ export const getWalletActivity = async (req, res) => {
         const totalCount = await countData(walletActivityModel, criteria);
 
         // Calculate Stats for Ledger
-        const statsCriteria: any = { userId: criteria.userId, isDeleted: false };
+        const statsCriteria: any = { isDeleted: false };
+        if (criteria.userId) { statsCriteria.userId = criteria.userId; }
         if (criteria.createdAt) statsCriteria.createdAt = criteria.createdAt;
 
         const activityStats = await walletActivityModel.aggregate([
             { $match: statsCriteria },
-            {
-                $group: {
-                    _id: "$type",
-                    totalAmount: { $sum: "$amount" },
-                    count: { $sum: 1 }
-                }
-            }
+            { $group: { _id: "$type", totalAmount: { $sum: "$amount" }, count: { $sum: 1 } } }
         ]);
 
         const stats = {
@@ -39,7 +43,7 @@ export const getWalletActivity = async (req, res) => {
             totalDebits: activityStats.find(s => s._id === WALLET_ACTIVITY_TYPE.DEBIT)?.totalAmount || 0
         };
 
-        return res.status(HTTP_STATUS.OK).json(new apiResponse(HTTP_STATUS.OK, responseMessage.getDataSuccess("Wallet Activity"), {
+        const result = {
             data: response,
             totalData: totalCount,
             stats,
@@ -48,7 +52,10 @@ export const getWalletActivity = async (req, res) => {
                 limit,
                 page_limit: Math.ceil(totalCount / limit) || 1
             }
-        }, {}));
+        };
+
+        await redisSet(cacheKey, result, 300);
+        return res.status(HTTP_STATUS.OK).json(new apiResponse(HTTP_STATUS.OK, responseMessage.getDataSuccess("Wallet Activity"), result, {}));
     } catch (error) {
         console.error(error);
         return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(new apiResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, responseMessage.internalServerError, {}, error));
@@ -58,8 +65,14 @@ export const getWalletActivity = async (req, res) => {
 export const getWalletBalance = async (req, res) => {
     reqInfo(req);
     try {
+        const cacheKey = `wallet:balance:${req.user._id}`;
+        const cached = await redisGet(cacheKey);
+        if (cached) return res.status(HTTP_STATUS.OK).json(new apiResponse(HTTP_STATUS.OK, "Balance fetched successfully", cached, {}));
+
         const user = await getFirstMatch(userModel, { _id: req.user._id }, { walletBalance: 1 });
-        return res.status(HTTP_STATUS.OK).json(new apiResponse(HTTP_STATUS.OK, "Balance fetched successfully", { walletBalance: user?.walletBalance || 0 }, {}));
+        const result = { walletBalance: user?.walletBalance || 0 };
+        await redisSet(cacheKey, result, 60);
+        return res.status(HTTP_STATUS.OK).json(new apiResponse(HTTP_STATUS.OK, "Balance fetched successfully", result, {}));
     } catch (error) {
         console.error(error);
         return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(new apiResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, responseMessage.internalServerError, {}, error));

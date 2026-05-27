@@ -1,24 +1,28 @@
 import { userModel } from '../../database';
-import { apiResponse, compareHash, generateHash, generateToken, HTTP_STATUS, isValidObjectId } from '../../common';
-import { getFirstMatch, reqInfo, responseMessage } from '../../helper';
+import { compareHash, generateHash, generateToken, HTTP_STATUS, isValidObjectId } from '../../common';
+import { getFirstMatch, reqInfo, responseMessage, redisDelPattern, redisGet, redisSet, apiResponse } from '../../helper';
 import { changePasswordSchema, loginSchema } from '../../validation';
 
 export const login = async (req, res) => {
     reqInfo(req);
-
     try {
         const { error, value } = loginSchema.validate(req.body);
         if (error) return res.status(HTTP_STATUS.BAD_REQUEST).json(new apiResponse(HTTP_STATUS.BAD_REQUEST, error.details[0].message, {}, {}));
 
         const identifier = value.username?.trim();
-        const user = await getFirstMatch(userModel, {
-            $or: [
-                { username: { $regex: `^${identifier}$`, $options: 'i' } },
-                { email: identifier?.toLowerCase() }
-            ],
-            isDeleted: false
-        });
+        const cacheKey = `auth:user:${identifier?.toLowerCase()}`;
+        let user = await redisGet<any>(cacheKey);
 
+        if (!user) {
+            user = await getFirstMatch(userModel, {
+                $or: [
+                    { username: { $regex: `^${identifier}$`, $options: 'i' } },
+                    { email: identifier?.toLowerCase() }
+                ],
+                isDeleted: false
+            });
+            if (user) { await redisSet(cacheKey, user, 300); }
+        }
         if (!user) return res.status(HTTP_STATUS.UNAUTHORIZED).json(new apiResponse(HTTP_STATUS.UNAUTHORIZED, responseMessage.invalidCredentials(value.username), {}, {}));
 
         const isMatch = await compareHash(value.password, user.password);
@@ -26,7 +30,6 @@ export const login = async (req, res) => {
         if (!user.isActive) return res.status(HTTP_STATUS.FORBIDDEN).json(new apiResponse(HTTP_STATUS.FORBIDDEN, responseMessage.accountBlock, {}, {}));
 
         const token = await generateToken(user, '2h');
-
         return res.status(HTTP_STATUS.OK).json(new apiResponse(HTTP_STATUS.OK, responseMessage.loginSuccess, {
             _id: user._id,
             name: user.name,
@@ -57,7 +60,8 @@ export const changePassword = async (req, res) => {
         userData.password = hashPassword;
 
         await userData.save();
-
+        await redisDelPattern(`auth:user:${userData.username?.toLowerCase()}`);
+        await redisDelPattern(`auth:user:${userData.email?.toLowerCase()}`);
         return res.status(HTTP_STATUS.OK).json(new apiResponse(HTTP_STATUS.OK, responseMessage.passwordChangeSuccess, {}, {}));
     } catch (error) {
         console.error(error);
